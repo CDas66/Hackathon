@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,7 +11,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Basic Flutter App',
+      title: 'Study Buddy',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const MyHomePage(),
     );
@@ -23,11 +25,16 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Demo')),
-      body: const Center(
-        child: Text(
-          'Hello, Flutter!',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      appBar: AppBar(
+        title: const Text('Study Budy'),
+        backgroundColor: Color.fromARGB(255, 190, 3, 237),
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            if (kDebugMode) {
+              print('Menu button clicked!');
+            }
+          },
         ),
       ),
     );
