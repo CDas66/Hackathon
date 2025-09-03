@@ -1,0 +1,286 @@
+{
+    "intents": [
+        {
+            "tag": "greetings",
+            "patterns": [
+                "hello",
+                "hey",
+                "hola",
+                "hi",
+                "good day",
+                "Greetings",
+                "what's up?",
+                "how its going?",
+                "yo"
+            ],
+            "responses": [
+                "Hello!",
+                "Hey!",
+                "What can I do for you ?",
+                "How can I help you ?"
+            ]
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "tata",
+                "bye",
+                "see you later",
+                "I am leaving",
+                "see ya",
+                "see you later",
+                "cya",
+                "see ya"
+            ],
+            "responses": [
+                "Bye !",
+                "See you later",
+                "Have a great day"
+            ]
+        },
+        {
+            "tag": "creator",
+            "patterns": [
+                "who created you",
+                "who is your creator",
+                "what is your creator's name?",
+                "you is made by whome?"
+            ],
+            "responses": [
+                "my creator is ********* his devloper name is C_55"
+            ]
+        },
+        {
+            "tag": "name",
+            "patterns": [
+                "what is your name?",
+                "what's your name",
+                "what your name is",
+                "can i know your name?",
+                "what can i call you?"
+            ],
+            "responses": [
+                "My name is Virti(spells like: vir - chi)",
+                "I am your personal assistant but , you can call me Virti by love"
+            ]
+        },
+        {
+            "tag": "creation",
+            "patterns": [
+                "When were you created ?",
+                "When were you invented ?",
+                "When were you got yur first breath ?",
+                "when you was first created ?"
+            ],
+            "responses": [
+                "I was ceated in 3rd July 2024",
+                "My birth anniversary was on 3rd July 2024"
+            ]
+        },
+        {
+            "tag": "hobby",
+            "patterns": [
+                "What is your hobby ?",
+                "what do you like to do everyday ?",
+                "what is your faveroute thing to do ?"
+            ],
+            "responses": [
+                "I like to do Singing",
+                "Singing is my hobby."
+            ]
+        },
+        {
+            "tag": "search",
+            "patterns": [
+                "what is my ip",
+                "what time is it",
+                "how to register to vote",
+                "how to tie a tie",
+                "can you run it",
+                "what song is this",
+                "how to lose weight",
+                "how many ounces in a, cup",
+                "when is mothers day",
+                "how many ounces in a pound",
+                "how many ounces in a gallon",
+                "how many weeks in a year",
+                "when is fathers day",
+                "what is my ip address",
+                "can i run it",
+                "how to get pregnant",
+                "how to download youtube videos",
+                "how to screenshot on mac",
+                "how old is donald trump",
+                "how to lose weight fast",
+                "where are you now",
+                "how to make pancakes",
+                "when we were young",
+                "how to make money",
+                "how many grams in an ounce",
+                "how many feet in a mile",
+                "what time is it in california",
+                "what does smh mean",
+                "how old is hillary clinton",
+                "how to lose belly fat",
+                "is it going to rain today",
+                "where is my phone",
+                "what is the weather today",
+                "how to download videos from youtube",
+                "how to boil eggs",
+                "how to delete instagram account"
+            ],
+            "responses": [
+                "search"
+            ]
+        },
+        {
+            "tag": "jokes",
+            "patterns": [
+                "tell me some jokes",
+                "make me laugh",
+                "jokes could make me feel better",
+                "could you tell me some jokes",
+                "i am very boared",
+                "i want to laugh"
+            ],
+            "responses": [
+                "jokes"
+            ]
+        },
+        {
+            "tag": "science fiction",
+            "patterns": [
+                "jurrasic park",
+                "robot",
+                "terminator",
+                "oppenheimer",
+                "interstellar"
+            ],
+            "responses": [
+                "science fiction"
+            ]
+        },
+        {
+            "tag": "action",
+            "patterns": [
+                "pushpa",
+                "bade miyan chote miyan",
+                "fast and furious",
+                "race3",
+                "street dancer3"
+            ],
+            "responses": [
+                "action"
+            ]
+        },
+        {
+            "tag": "adventurous",
+            "patterns": [
+                "national treasure",
+                "jumanji two",
+                "train to busan",
+                "world war Z",
+                "now you see me",
+                "air collision"
+            ],
+            "responses": [
+                "adventurous"
+            ]
+        },
+        {
+            "tag": "romantic",
+            "patterns": [
+                "kuch kuch hota hai",
+                "dilwale dulhaniya le jayenge",
+                "dharak",
+                "taqdeer",
+                "titanic"
+            ],
+            "responses": [
+                "romantic"
+            ]
+        },
+        {
+            "tag": "comedy",
+            "patterns": [
+                "entertainment",
+                "chennai express",
+                "hera pheri",
+                "phir hera pheri",
+                "bhool bhulaiyaa",
+                "housefull 1",
+                "housefull 2",
+                "housefull 3",
+                "housefull 4"
+            ],
+            "responses": [
+                "comedy"
+            ]
+        },
+        {
+            "tag": "horror",
+            "patterns": [
+                "annabelle",
+                "conjuring",
+                "nun",
+                "the exoecist",
+                "the child remains"
+            ],
+            "responses": [
+                "horror"
+            ]
+        },
+        {
+            "tag": "detective",
+            "patterns": [
+                "durgeshgorer guptodhon",
+                "guptodhoner sondhane",
+                "karnasubarner guptodhon",
+                "agent007",
+                "sherlock holmes in new york",
+                "the lost city of gold 2"
+            ],
+            "responses": [
+                "detective"
+            ]
+        },
+        {
+            "tag": "marvel",
+            "patterns": [
+                "infinity war",
+                "end game",
+                "the iron",
+                "the iron3",
+                "civil war",
+                "thor the dark world",
+                "thor ragnarok",
+                "spider man",
+                "spiderman homecoming",
+                "spiderman far from home",
+                "spiderman no way home"
+            ],
+            "responses": [
+                "marvel"
+            ]
+        },
+        {
+            "tag": "",
+            "patterns": [
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " ",
+                " "
+            ],
+            "responses": [
+                ""
+            ]
+        }
+    ]
+}
