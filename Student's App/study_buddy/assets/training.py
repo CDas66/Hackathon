@@ -2,7 +2,7 @@ import random
 import json
 import pickle
 import numpy as np
-
+import json
 import nltk
 import tensorflow as tf
 from nltk.stem import WordNetLemmatizer
@@ -79,16 +79,11 @@ tflite_model = converter.convert()
 with open("AI.tflite", "wb") as f:
     f.write(tflite_model)
 
-print("AI.tflite model saved!")
-metadata = {
-    "words": words,   # vocabulary list
-    "labels": classes # intent tags
-}
-
 with open("metadata.json", "w") as f:
-    json.dump(metadata, f)
+    json.dump({"words": words, "labels": classes}, f)
 
-print("metadata.json saved!")
+
+print("AI.tflite model saved!")
 
 
 print('done')

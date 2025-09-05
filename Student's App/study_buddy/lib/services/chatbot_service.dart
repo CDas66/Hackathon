@@ -13,7 +13,7 @@ class ChatbotService {
 
   Future<void> init() async {
     // Load AI model
-    _interpreter = await Interpreter.fromAsset('AI.tflite');
+    _interpreter = await Interpreter.fromAsset('assets/AI.tflite');
 
     // Load intents.json
     final jsonStr = await rootBundle.loadString('assets/intents.json');

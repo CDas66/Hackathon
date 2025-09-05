@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLogin});
-  final void Function(String code) onLogin;
+  final void Function(String username) onLogin;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -13,7 +15,6 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _controller = TextEditingController();
   bool _loading = false;
 
-  // Animation controller for fade-in elements
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  void _tryLogin() async {
+  Future<void> _tryLogin() async {
     final code = _controller.text.trim();
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -45,9 +46,38 @@ class _LoginScreenState extends State<LoginScreen>
       );
       return;
     }
+
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    widget.onLogin(code);
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('loginCodes')
+          .doc(code)
+          .get();
+
+      if (!doc.exists) {
+        ScaffoldMessenger.of(
+          // ignore: use_build_context_synchronously
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid class code.')));
+      } else {
+        final data = doc.data()!;
+        final username = data['username'] ?? "Guest";
+
+        // Save username locally
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', username);
+
+        // ✅ Pass username to onLogin
+        widget.onLogin(username);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+
+    setState(() => _loading = false);
   }
 
   @override
