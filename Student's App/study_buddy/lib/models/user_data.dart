@@ -14,7 +14,14 @@ class UserData {
   });
 
   Map<String, dynamic> toMap() {
-    return {'health': health, 'steps': steps, 'streak': streak, 'score': score};
+    return {
+      'username':
+          username, // include username in map too if you want to store it
+      'health': health,
+      'steps': steps,
+      'streak': streak,
+      'score': score,
+    };
   }
 
   factory UserData.fromMap(String username, Map<String, dynamic>? map) {
@@ -36,9 +43,15 @@ class UserData {
     );
   }
 
-  UserData copyWith({int? health, int? steps, int? streak, int? score}) {
+  UserData copyWith({
+    String? username,
+    int? health,
+    int? steps,
+    int? streak,
+    int? score,
+  }) {
     return UserData(
-      username: username,
+      username: username ?? this.username,
       health: health ?? this.health,
       steps: steps ?? this.steps,
       streak: streak ?? this.streak,

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pedometer/pedometer.dart';
 import '../models/task.dart';
 import '../services/firestore_service.dart';
 import '../models/user_data.dart';
@@ -6,18 +8,19 @@ import '../models/user_data.dart';
 class HomeTab extends StatefulWidget {
   const HomeTab({
     super.key,
-    required this.studentCode,
+    required this.code,
+    required this.username,
     required this.onOpenChat,
     required this.onOpenSchedule,
     required this.onQuickSOS,
-    required this.tasks, // <--- receive tasks from main
+    required this.tasks,
   });
-
-  final String studentCode;
+  final String code;
+  final String username;
   final VoidCallback onOpenChat;
   final VoidCallback onOpenSchedule;
   final VoidCallback onQuickSOS;
-  final List<Task> tasks; // <-- list of tasks
+  final List<Task> tasks;
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -33,24 +36,32 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
     'Steps': false,
     'Streak': false,
   };
+
   final FirestoreService _firestore = FirestoreService();
   UserData? _userData;
+
+  late Stream<StepCount> _stepCountStream;
+  int _steps = 0;
+  final int _stepGoal = 10000;
 
   @override
   void initState() {
     super.initState();
-    _firestore.streamUserData(widget.studentCode).listen((data) {
-      setState(() => _userData = data);
+
+    // Listen to Firestore user data
+    _firestore.streamUserData(widget.username).listen((data) {
+      _userData = data;
+      _steps = data.steps;
     });
+
+    // Setup pulsing animation for SOS button
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     );
-
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
     _pulseController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _pulseController.reverse();
@@ -58,8 +69,27 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
         _pulseController.forward();
       }
     });
-
     _pulseController.forward();
+
+    // Initialize pedometer stream
+    _initPedometer();
+  }
+
+  void _initPedometer() {
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(
+      (StepCount event) {
+        setState(() {
+          _steps = event.steps;
+          _firestore.updateSteps(widget.username, widget.code, _steps);
+        });
+      },
+      onError: (error) {
+        if (kDebugMode) {
+          print('Step Count Error: $error');
+        }
+      },
+    );
   }
 
   @override
@@ -76,18 +106,19 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final double spacing = 16;
+    const double spacing = 16;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Text(
-            'Welcome, ${widget.studentCode}',
+            'Welcome, ${widget.username}',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
 
+          // Tasks Card
           _buildExpandableCard(
             title: 'Tasks',
             subtitle: 'You have ${widget.tasks.length} pending tasks',
@@ -134,6 +165,8 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
           ),
 
           SizedBox(height: spacing),
+
+          // Health Card
           _buildExpandableCard(
             title: 'Health',
             subtitle: 'Heart rate: 78 bpm',
@@ -145,14 +178,17 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 8),
-                Text('Steps: ${_userData?.health}'),
+                Text('Steps recorded: $_steps'),
               ],
             ),
           ),
+
           SizedBox(height: spacing),
+
+          // Steps Card
           _buildExpandableCard(
             title: 'Steps',
-            subtitle: '${_userData?.steps} steps today',
+            subtitle: '$_steps steps today',
             colors: [Colors.green.shade100, Colors.green.shade50],
             icon: Icons.directions_walk,
             expanded: _expandedCards['Steps']!,
@@ -161,19 +197,22 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               children: [
                 const SizedBox(height: 8),
                 LinearProgressIndicator(
-                  value: 5432 / 10000,
+                  value: (_steps / _stepGoal).clamp(0.0, 1.0),
                   color: Colors.green,
                   backgroundColor: Colors.green.shade200,
                 ),
                 const SizedBox(height: 4),
-                const Text('Goal: 10,000 steps'),
+                Text('Goal: $_stepGoal steps'),
               ],
             ),
           ),
+
           SizedBox(height: spacing),
+
+          // Streak Card
           _buildExpandableCard(
             title: 'Daily Streak',
-            subtitle: '${_userData?.streak} days of check-in',
+            subtitle: '${_userData?.streak ?? 0} days of check-in',
             colors: [Colors.orange.shade100, Colors.orange.shade50],
             icon: Icons.star_outline,
             expanded: _expandedCards['Streak']!,
@@ -187,8 +226,10 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
+
           SizedBox(height: spacing),
 
+          // SOS Button
           ScaleTransition(
             scale: _pulseAnimation,
             child: ElevatedButton.icon(

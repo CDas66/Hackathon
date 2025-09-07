@@ -19,4 +19,16 @@ class FirestoreService {
       return UserData.fromMap(username, snap.data());
     });
   }
+
+  Future<void> updateSteps(String username, String code, int steps) async {
+    await _firestore
+        .collection('class_code')
+        .doc(code)
+        .collection('users')
+        .doc(username)
+        .set(
+          {'steps': steps},
+          SetOptions(merge: true), // Merge so other fields are not overwritten
+        );
+  }
 }

@@ -22,13 +22,27 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final prefs = await SharedPreferences.getInstance();
-  final savedUsername = prefs.getString('username'); // load saved username
-  runApp(StudyBuddyApp(savedUsername: savedUsername));
+  final studentCode = prefs.getString('code');
+  final username = prefs.getString('username');
+  runApp(StudyBuddyApp(studentCode: studentCode, username: username));
 }
 
 class StudyBuddyApp extends StatefulWidget {
-  final String? savedUsername;
-  const StudyBuddyApp({super.key, this.savedUsername});
+  final String? studentCode;
+  final String? username;
+  final int? health;
+  final int? steps;
+  final int? streak;
+  final int? score;
+  const StudyBuddyApp({
+    super.key,
+    required this.studentCode,
+    required this.username,
+    this.health,
+    this.score,
+    this.steps,
+    this.streak,
+  });
 
   @override
   State<StudyBuddyApp> createState() => _StudyBuddyAppState();
@@ -36,26 +50,30 @@ class StudyBuddyApp extends StatefulWidget {
 
 class _StudyBuddyAppState extends State<StudyBuddyApp> {
   bool _loggedIn = false;
-  String _studentCode = '';
+  String _code = '';
+  // ignore: unused_field
+  String _username = '';
   final List<String> _pendingSOS = [];
   final List<Task> _tasks = [];
 
   @override
   void initState() {
     super.initState();
-    if (widget.savedUsername != null) {
-      _loggedIn = true;
-      _studentCode = widget.savedUsername!;
+    if (widget.studentCode != null) {
+      _code = widget.studentCode!;
+      _username = widget.username!;
     }
   }
 
-  void _login(String username) async {
+  void _login(String code, String username) async {
     setState(() {
       _loggedIn = true;
-      _studentCode = username;
+      _code = code;
+      _username = username;
     });
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', username);
+    await prefs.setString('username', _username);
+    await prefs.setString('class_code', _code);
 
     HapticFeedback.selectionClick();
   }
@@ -63,12 +81,14 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
   void _logout() async {
     setState(() {
       _loggedIn = false;
-      _studentCode = '';
+      _code = '';
+      _username = '';
     });
 
     // Remove saved username
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
+    await prefs.remove('class_code');
   }
 
   void _queueSOS() {
@@ -85,8 +105,9 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
   Widget build(BuildContext context) {
     final pages = <Widget>[
       HomeTab(
+        code: _code,
         tasks: _tasks,
-        studentCode: _studentCode,
+        username: _username,
         onOpenChat: () => setState(() => _selected = 1),
         onOpenSchedule: () => setState(() => _selected = 2),
         onQuickSOS: _queueSOS,
@@ -94,7 +115,7 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
       ChatTab(),
       ScheduleTab(tasks: _tasks, onAdd: _addTask),
       SOSTab(),
-      ProfileTab(studentCode: _studentCode, onLogout: _logout),
+      ProfileTab(studentCode: _username, onLogout: _logout),
     ];
 
     return MaterialApp(
