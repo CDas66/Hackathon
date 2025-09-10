@@ -4,20 +4,36 @@ import 'package:study_buddy/models/user_data.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> setUserData(UserData data) async {
-    await _firestore.collection('users').doc(data.username).set(data.toMap());
+  Future<void> setUserData(UserData data, String code) async {
+    await _firestore
+        .collection('class_code')
+        .doc(code)
+        .collection('users')
+        .doc(data.username)
+        .set(data.toMap());
   }
 
-  Future<UserData?> getUserData(String username) async {
-    final doc = await _firestore.collection('users').doc(username).get();
+  Future<UserData?> getUserData(String username, String code) async {
+    final doc = await _firestore
+        .collection('class_code')
+        .doc(code)
+        .collection('users')
+        .doc(username)
+        .get();
     if (!doc.exists) return null;
     return UserData.fromMap(username, doc.data()!);
   }
 
-  Stream<UserData> streamUserData(String username) {
-    return _firestore.collection('users').doc(username).snapshots().map((snap) {
-      return UserData.fromMap(username, snap.data());
-    });
+  Stream<UserData> streamUserData(String username, String code) {
+    return _firestore
+        .collection('class_code')
+        .doc(code)
+        .collection('users')
+        .doc(username)
+        .snapshots()
+        .map((snap) {
+          return UserData.fromMap(username, snap.data());
+        });
   }
 
   Future<void> updateSteps(String username, String code, int steps) async {

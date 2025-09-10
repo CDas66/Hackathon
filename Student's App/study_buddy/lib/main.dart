@@ -22,7 +22,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final prefs = await SharedPreferences.getInstance();
-  final studentCode = prefs.getString('code');
+  final studentCode = prefs.getString('class_code');
   final username = prefs.getString('username');
   runApp(StudyBuddyApp(studentCode: studentCode, username: username));
 }
@@ -49,29 +49,31 @@ class StudyBuddyApp extends StatefulWidget {
 }
 
 class _StudyBuddyAppState extends State<StudyBuddyApp> {
-  bool _loggedIn = false;
   String _code = '';
   // ignore: unused_field
   String _username = '';
   final List<String> _pendingSOS = [];
   final List<Task> _tasks = [];
+  bool? _loggedIn;
 
   @override
   void initState() {
     super.initState();
-    if (widget.studentCode != null) {
+    if (widget.studentCode != null || widget.username != null) {
       _code = widget.studentCode!;
       _username = widget.username!;
     }
+    _checkLogin();
   }
 
   void _login(String code, String username) async {
     setState(() {
-      _loggedIn = true;
       _code = code;
       _username = username;
+      _loggedIn = true;
     });
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('loggedIn', true);
     await prefs.setString('username', _username);
     await prefs.setString('class_code', _code);
 
@@ -80,14 +82,15 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
 
   void _logout() async {
     setState(() {
-      _loggedIn = false;
       _code = '';
       _username = '';
+      _loggedIn = false;
     });
 
     // Remove saved username
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
+    await prefs.remove('loggedIn');
     await prefs.remove('class_code');
   }
 
@@ -97,12 +100,21 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
     HapticFeedback.heavyImpact();
   }
 
+  Future<void> _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loggedIn = prefs.getBool('loggedIn') ?? false;
+    setState(() {
+      _loggedIn = loggedIn;
+    });
+  }
+
   void _addTask(Task t) => setState(() => _tasks.add(t));
 
   int _selected = 0;
 
   @override
   Widget build(BuildContext context) {
+    _loggedIn ??= false;
     final pages = <Widget>[
       HomeTab(
         code: _code,
@@ -122,7 +134,7 @@ class _StudyBuddyAppState extends State<StudyBuddyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Study Buddy',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
-      home: _loggedIn
+      home: _loggedIn!
           ? Scaffold(
               body: Stack(
                 children: [
@@ -218,7 +230,8 @@ class _NavButton extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-  });
+    Key? key,
+  }) : super(key: key);
 
   final IconData icon;
   final String label;
@@ -227,23 +240,26 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = selected ? Colors.indigo : Colors.grey;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
+      splashColor: Colors.transparent,
+      // ignore: deprecated_member_use
+      highlightColor: Colors.indigo.withOpacity(0.15),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: selected ? Colors.indigo : Colors.grey),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.indigo : Colors.grey,
-                fontSize: 12,
-              ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: selected ? const EdgeInsets.all(5) : EdgeInsets.zero,
+              decoration: BoxDecoration(color: Colors.transparent),
+              child: Icon(icon, color: color, size: selected ? 28 : 24),
             ),
+            const SizedBox(height: 4),
           ],
         ),
       ),

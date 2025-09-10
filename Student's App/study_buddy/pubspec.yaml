@@ -12,6 +12,7 @@ dependencies:
   firebase_core: ^4.1.0
   flutter:
     sdk: flutter
+  intl: ^0.20.2
   pedometer: ^4.1.1
   shared_preferences: ^2.5.3
   tflite_flutter: ^0.11.0

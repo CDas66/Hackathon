@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen>
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('class_code', code);
         await prefs.setString('username', username);
+        await prefs.setBool('loggedIn', true);
 
         // Pass the code to main app
         widget.onLogin(code, username);
